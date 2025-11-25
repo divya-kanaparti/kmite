@@ -17,7 +17,32 @@
 
 //   const [rowCount, setRowCount] = useState(0);
 
+//   // NEW: duplicate highlighting
+//   const [duplicateMap, setDuplicateMap] = useState({});
+
 //   const handleUploadClick = () => fileInputRef.current?.click();
+
+//   const processDuplicates = (rows) => {
+//     const freq = {};
+//     rows.forEach((row, r) => {
+//       row.forEach((cell, c) => {
+//         const key = String(cell ?? "");
+//         if (!freq[key]) freq[key] = [];
+//         freq[key].push({ r, c });
+//       });
+//     });
+
+//     const dup = {};
+//     Object.keys(freq).forEach((key) => {
+//       if (freq[key].length > 1 && key !== "") {
+//         freq[key].forEach(({ r, c }) => {
+//           dup[`${r}-${c}`] = true;
+//         });
+//       }
+//     });
+
+//     setDuplicateMap(dup);
+//   };
 
 //   const handleFile = async (e) => {
 //     const file = e.target.files?.[0];
@@ -42,12 +67,12 @@
 
 //     setSheetData(rows);
 
-    
 //     const count = rows.filter((r) =>
 //       r.some((cell) => cell !== null && cell !== "")
 //     ).length;
 //     setRowCount(count);
 
+//     processDuplicates(rows);
 //     setQuery("");
 //   };
 
@@ -63,14 +88,14 @@
 
 //     setSheetData(rows);
 
-   
 //     const count = rows.filter((r) =>
 //       r.some((cell) => cell !== null && cell !== "")
 //     ).length;
 //     setRowCount(count);
+
+//     processDuplicates(rows);
 //   };
 
-  
 //   const filteredData = React.useMemo(() => {
 //     if (!sheetData || !query) return sheetData;
 
@@ -92,7 +117,6 @@
 
 //         {id === "1" && (
 //           <>
-//             {/* UPLOAD BUTTON */}
 //             <button onClick={handleUploadClick} style={styles.uploadButton}>
 //               Upload Excel
 //             </button>
@@ -107,7 +131,6 @@
 
 //             {fileName && <p style={styles.fileName}>Uploaded: {fileName}</p>}
 
-//             {/* SHEET DROPDOWN */}
 //             {sheets.length > 1 && (
 //               <div style={{ marginTop: 20 }}>
 //                 <select
@@ -124,7 +147,6 @@
 //               </div>
 //             )}
 
-//             {/* SEARCH BAR */}
 //             {sheetData && (
 //               <div style={styles.searchBar}>
 //                 <input
@@ -140,14 +162,12 @@
 //               </div>
 //             )}
 
-//             {/* NEW: ROW COUNT (top-right) */}
 //             {sheetData && (
 //               <div style={styles.rowCount}>
 //                 Count: {rowCount}
 //               </div>
 //             )}
 
-//             {/* TABLE */}
 //             {filteredData && (
 //               <div style={styles.tableWrapper}>
 //                 <table style={styles.table}>
@@ -155,7 +175,19 @@
 //                     {filteredData.map((row, r) => (
 //                       <tr key={r}>
 //                         {row.map((cell, c) => (
-//                           <td key={c} style={styles.cell}>
+//                           <td
+//                             key={c}
+//                             style={{
+//                               ...styles.cell,
+//                               background: duplicateMap[`${r}-${c}`]
+//                                 ? "#ffcc00"
+//                                 : "transparent",
+//                               color: duplicateMap[`${r}-${c}`] ? "#000" : "#fff",
+//                               fontWeight: duplicateMap[`${r}-${c}`]
+//                                 ? "700"
+//                                 : "400",
+//                             }}
+//                           >
 //                             {String(cell ?? "")}
 //                           </td>
 //                         ))}
@@ -168,7 +200,6 @@
 //           </>
 //         )}
 
-//         {/* BACK BUTTON */}
 //         <Link to="/" style={styles.backButton}>
 //           ← Back to Home
 //         </Link>
@@ -298,6 +329,7 @@
 //   },
 // };
 
+
 import { useParams, Link } from "react-router-dom";
 import React, { useRef, useState } from "react";
 import * as XLSX from "xlsx/dist/xlsx.full.min.js";
@@ -406,6 +438,9 @@ export default function TaskPage() {
     );
   }, [sheetData, query]);
 
+  // ⭐ NEW: Count filtered rows instead of full rows
+  const displayedCount = filteredData ? filteredData.length : 0;
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -462,9 +497,10 @@ export default function TaskPage() {
               </div>
             )}
 
+            {/* ⭐ Updated: Count shows filtered rows */}
             {sheetData && (
               <div style={styles.rowCount}>
-                Count: {rowCount}
+                Count: {displayedCount}
               </div>
             )}
 
