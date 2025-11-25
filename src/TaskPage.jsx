@@ -17,6 +17,7 @@
 
 //   const [rowCount, setRowCount] = useState(0);
 
+<<<<<<< HEAD
 //   // NEW: duplicate highlighting
 //   const [duplicateMap, setDuplicateMap] = useState({});
 
@@ -44,6 +45,10 @@
 //     setDuplicateMap(dup);
 //   };
 
+=======
+//   const handleUploadClick = () => fileInputRef.current?.click();
+
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //   const handleFile = async (e) => {
 //     const file = e.target.files?.[0];
 //     if (!file) return;
@@ -67,12 +72,19 @@
 
 //     setSheetData(rows);
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //     const count = rows.filter((r) =>
 //       r.some((cell) => cell !== null && cell !== "")
 //     ).length;
 //     setRowCount(count);
 
+<<<<<<< HEAD
 //     processDuplicates(rows);
+=======
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //     setQuery("");
 //   };
 
@@ -88,14 +100,24 @@
 
 //     setSheetData(rows);
 
+<<<<<<< HEAD
+=======
+   
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //     const count = rows.filter((r) =>
 //       r.some((cell) => cell !== null && cell !== "")
 //     ).length;
 //     setRowCount(count);
+<<<<<<< HEAD
 
 //     processDuplicates(rows);
 //   };
 
+=======
+//   };
+
+  
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //   const filteredData = React.useMemo(() => {
 //     if (!sheetData || !query) return sheetData;
 
@@ -117,6 +139,10 @@
 
 //         {id === "1" && (
 //           <>
+<<<<<<< HEAD
+=======
+//             {/* UPLOAD BUTTON */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //             <button onClick={handleUploadClick} style={styles.uploadButton}>
 //               Upload Excel
 //             </button>
@@ -131,6 +157,10 @@
 
 //             {fileName && <p style={styles.fileName}>Uploaded: {fileName}</p>}
 
+<<<<<<< HEAD
+=======
+//             {/* SHEET DROPDOWN */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //             {sheets.length > 1 && (
 //               <div style={{ marginTop: 20 }}>
 //                 <select
@@ -147,6 +177,10 @@
 //               </div>
 //             )}
 
+<<<<<<< HEAD
+=======
+//             {/* SEARCH BAR */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //             {sheetData && (
 //               <div style={styles.searchBar}>
 //                 <input
@@ -162,12 +196,20 @@
 //               </div>
 //             )}
 
+<<<<<<< HEAD
+=======
+//             {/* NEW: ROW COUNT (top-right) */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //             {sheetData && (
 //               <div style={styles.rowCount}>
 //                 Count: {rowCount}
 //               </div>
 //             )}
 
+<<<<<<< HEAD
+=======
+//             {/* TABLE */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //             {filteredData && (
 //               <div style={styles.tableWrapper}>
 //                 <table style={styles.table}>
@@ -175,6 +217,7 @@
 //                     {filteredData.map((row, r) => (
 //                       <tr key={r}>
 //                         {row.map((cell, c) => (
+<<<<<<< HEAD
 //                           <td
 //                             key={c}
 //                             style={{
@@ -188,6 +231,9 @@
 //                                 : "400",
 //                             }}
 //                           >
+=======
+//                           <td key={c} style={styles.cell}>
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //                             {String(cell ?? "")}
 //                           </td>
 //                         ))}
@@ -200,6 +246,10 @@
 //           </>
 //         )}
 
+<<<<<<< HEAD
+=======
+//         {/* BACK BUTTON */}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 //         <Link to="/" style={styles.backButton}>
 //           ← Back to Home
 //         </Link>
@@ -329,7 +379,10 @@
 //   },
 // };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
 import { useParams, Link } from "react-router-dom";
 import React, { useRef, useState } from "react";
 import * as XLSX from "xlsx/dist/xlsx.full.min.js";
@@ -438,9 +491,12 @@ export default function TaskPage() {
     );
   }, [sheetData, query]);
 
+<<<<<<< HEAD
   // ⭐ NEW: Count filtered rows instead of full rows
   const displayedCount = filteredData ? filteredData.length : 0;
 
+=======
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -497,10 +553,16 @@ export default function TaskPage() {
               </div>
             )}
 
+<<<<<<< HEAD
             {/* ⭐ Updated: Count shows filtered rows */}
             {sheetData && (
               <div style={styles.rowCount}>
                 Count: {displayedCount}
+=======
+            {sheetData && (
+              <div style={styles.rowCount}>
+                Count: {rowCount}
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
               </div>
             )}
 
@@ -663,4 +725,8 @@ const styles = {
     background: "#0d2238",
     borderTop: "1px solid #b38b59",
   },
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 3344716eb75d2e77162962553d95a5b9e81c0385
