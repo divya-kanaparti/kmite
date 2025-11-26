@@ -1,521 +1,4 @@
 
-// // import { useParams, Link } from "react-router-dom";
-// // import React, { useRef, useState, useEffect } from "react";
-// // import * as XLSX from "xlsx/dist/xlsx.full.min.js";
-
-// // export default function TaskPage() {
-// //   const { id } = useParams();
-
-// //   const fileInputRef = useRef(null);
-// //   const [workbook, setWorkbook] = useState(null);
-// //   const [sheetData, setSheetData] = useState(null);
-// //   const [fileName, setFileName] = useState("");
-
-// //   const [sheets, setSheets] = useState([]);
-// //   const [selectedSheet, setSelectedSheet] = useState("");
-
-// //   const [query, setQuery] = useState("");
-// //   const [rowCount, setRowCount] = useState(0);
-// //   const [duplicateMap, setDuplicateMap] = useState({});
-
-// //   // UI states
-// //   const [showMenu, setShowMenu] = useState(false);
-// //   const [showHistory, setShowHistory] = useState(false);
-// //   const [historyData, setHistoryData] = useState([]);
-
-// //   const handleUploadClick = () => fileInputRef.current?.click();
-
-// //   // Load upload history
-// //   const loadHistory = async () => {
-// //     try {
-// //       const res = await fetch("http://localhost:5000/history");
-// //       const data = await res.json();
-// //       setHistoryData(data);
-// //     } catch (err) {
-// //       console.error("Error loading history:", err);
-// //     }
-// //   };
-
-// //   useEffect(() => {
-// //     if (showHistory) loadHistory();
-// //   }, [showHistory]);
-
-// //   // Detect duplicates
-// //   const processDuplicates = (rows) => {
-// //     const freq = {};
-// //     rows.forEach((row, r) => {
-// //       row.forEach((cell, c) => {
-// //         const key = String(cell ?? "");
-// //         if (!freq[key]) freq[key] = [];
-// //         freq[key].push({ r, c });
-// //       });
-// //     });
-
-// //     const dup = {};
-// //     Object.keys(freq).forEach((key) => {
-// //       if (freq[key].length > 1 && key !== "") {
-// //         freq[key].forEach(({ r, c }) => {
-// //           dup[`${r}-${c}`] = true;
-// //         });
-// //       }
-// //     });
-
-// //     setDuplicateMap(dup);
-// //   };
-
-// //   // Handle Excel File Input
-// //   const handleFile = async (e) => {
-// //     const file = e.target.files?.[0];
-// //     if (!file) return;
-
-// //     setFileName(file.name);
-
-// //     const data = await file.arrayBuffer();
-// //     const wb = XLSX.read(data, { type: "array" });
-
-// //     setWorkbook(wb);
-// //     setSheets(wb.SheetNames);
-// //     setSelectedSheet(wb.SheetNames[0]);
-
-// //     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-// //       header: 1,
-// //       raw: false,
-// //       cellDates: true,
-// //     });
-
-// //     setSheetData(rows);
-
-// //     const count = rows.filter((r) =>
-// //       r.some((cell) => cell !== null && cell !== "")
-// //     ).length;
-
-// //     setRowCount(count);
-// //     processDuplicates(rows);
-// //     setQuery("");
-// //   };
-
-// //   // Change sheet
-// //   const handleSheetChange = (e) => {
-// //     const sheetName = e.target.value;
-// //     setSelectedSheet(sheetName);
-
-// //     const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
-// //       header: 1,
-// //       raw: false,
-// //       cellDates: true,
-// //     });
-
-// //     setSheetData(rows);
-
-// //     const count = rows.filter((r) =>
-// //       r.some((cell) => cell !== null && cell !== "")
-// //     ).length;
-
-// //     setRowCount(count);
-// //     processDuplicates(rows);
-// //   };
-
-// //   // Filter search
-// //   const filteredData = React.useMemo(() => {
-// //     if (!sheetData || !query) return sheetData;
-
-// //     const lower = query.toLowerCase();
-// //     return sheetData.filter((row) =>
-// //       row.some((cell) => String(cell ?? "").toLowerCase().includes(lower))
-// //     );
-// //   }, [sheetData, query]);
-
-// //   const displayedCount = filteredData ? filteredData.length : 0;
-
-// //   // Save JSON to MySQL
-// //   const saveToDatabase = async () => {
-// //     if (!sheetData) return alert("No data to save");
-
-// //     try {
-// //       const res = await fetch("http://localhost:5000/upload-json", {
-// //         method: "POST",
-// //         headers: { "Content-Type": "application/json" },
-// //         body: JSON.stringify({
-// //           file_name: fileName,
-// //           json_data: sheetData,
-// //         }),
-// //       });
-
-// //       const result = await res.json();
-// //       alert(result.message);
-// //     } catch (err) {
-// //       alert("Failed to save to database");
-// //     }
-// //   };
-
-// //   return (
-// //     <div style={styles.container}>
-// //       {/* HEADER */}
-// //       <header style={styles.header}>
-// //         <h2 style={styles.logo}>🏫 KMIT</h2>
-// //       </header>
-
-// //       {/* HAMBURGER */}
-// //       <div style={styles.hamburgerRow}>
-// //         <span style={styles.hamburger} onClick={() => setShowMenu(true)}>
-// //           ☰
-// //         </span>
-// //       </div>
-
-// //       {/* LEFT MENU */}
-// //       {showMenu && (
-// //         <div style={styles.sideMenu}>
-// //           <button
-// //             style={styles.closeMenuBtn}
-// //             onClick={() => setShowMenu(false)}
-// //           >
-// //             X
-// //           </button>
-
-// //           <h3 style={{ color: "#c9a646" }}>Menu</h3>
-
-// //           <button
-// //             style={styles.menuItem}
-// //             onClick={() => {
-// //               setShowHistory(true);
-// //               setShowMenu(false);
-// //             }}
-// //           >
-// //             📁 Upload History
-// //           </button>
-// //         </div>
-// //       )}
-
-// //       {/* HISTORY PANEL */}
-// //       {showHistory && (
-// //         <div style={styles.historyPanel}>
-// //           <div style={styles.historyHeader}>
-// //             <h3>Upload History</h3>
-// //             <button
-// //               onClick={() => setShowHistory(false)}
-// //               style={styles.closeBtn}
-// //             >
-// //               X
-// //             </button>
-// //           </div>
-
-// //           <div style={styles.historyList}>
-// //             {historyData.map((item) => (
-// //               <div key={item.id} style={styles.historyItem}>
-// //                 <div>
-// //                   <strong>{item.file_name}</strong>
-// //                   <div style={{ fontSize: "12px", opacity: 0.7 }}>
-// //                     {new Date(item.uploaded_at).toLocaleString("en-IN", {
-// //   timeZone: "Asia/Kolkata"
-// // })}
-// //                     {/* {item.uploaded_at} */}
-// //                   </div>
-// //                 </div>
-// //               </div>
-// //             ))}
-// //           </div>
-// //         </div>
-// //       )}
-
-// //       {/* MAIN SECTION */}
-// //       <main style={styles.main}>
-// //         <h1 style={styles.title}>Task {id}</h1>
-
-// //         {id === "1" && (
-// //           <>
-// //             <button onClick={handleUploadClick} style={styles.uploadButton}>
-// //               Upload Excel
-// //             </button>
-
-// //             <input
-// //               ref={fileInputRef}
-// //               type="file"
-// //               accept=".xlsx,.xls,.csv"
-// //               onChange={handleFile}
-// //               style={{ display: "none" }}
-// //             />
-
-// //             {fileName && <p style={styles.fileName}>Uploaded: {fileName}</p>}
-
-// //             {/* Sheet selector */}
-// //             {sheets.length > 1 && (
-// //               <select
-// //                 value={selectedSheet}
-// //                 onChange={handleSheetChange}
-// //                 style={styles.dropdown}
-// //               >
-// //                 {sheets.map((sheet, index) => (
-// //                   <option key={index} value={sheet}>
-// //                     {sheet}
-// //                   </option>
-// //                 ))}
-// //               </select>
-// //             )}
-
-// //             {/* Search */}
-// //             {sheetData && (
-// //               <div style={styles.searchBar}>
-// //                 <input
-// //                   value={query}
-// //                   onChange={(e) => setQuery(e.target.value)}
-// //                   placeholder="Search..."
-// //                   style={styles.searchInput}
-// //                 />
-// //                 <button onClick={() => setQuery("")} style={styles.clearButton}>
-// //                   Clear
-// //                 </button>
-// //               </div>
-// //             )}
-
-// //             {/* Row Count */}
-// //             {sheetData && (
-// //               <div style={styles.rowCount}>Count: {displayedCount}</div>
-// //             )}
-
-// //             {/* Save button */}
-// //             {sheetData && (
-// //               <button onClick={saveToDatabase} style={styles.saveButton}>
-// //                 Save Excel to Database
-// //               </button>
-// //             )}
-
-// //             {/* TABLE */}
-// //             {filteredData && (
-// //               <div style={styles.tableWrapper}>
-// //                 <table style={styles.table}>
-// //                   <tbody>
-// //                     {filteredData.map((row, r) => (
-// //                       <tr key={r}>
-// //                         {row.map((cell, c) => (
-// //                           <td
-// //                             key={c}
-// //                             style={{
-// //                               ...styles.cell,
-// //                               background: duplicateMap[`${r}-${c}`]
-// //                                 ? "#ffcc00"
-// //                                 : "transparent",
-// //                               color: duplicateMap[`${r}-${c}`] ? "#000" : "#fff",
-// //                               fontWeight: duplicateMap[`${r}-${c}`]
-// //                                 ? "700"
-// //                                 : "400",
-// //                             }}
-// //                           >
-// //                             {String(cell ?? "")}
-// //                           </td>
-// //                         ))}
-// //                       </tr>
-// //                     ))}
-// //                   </tbody>
-// //                 </table>
-// //               </div>
-// //             )}
-// //           </>
-// //         )}
-
-// //         <Link to="/" style={styles.backButton}>
-// //           ← Back to Home
-// //         </Link>
-// //       </main>
-
-// //       {/* FOOTER */}
-// //       <footer style={styles.footer}>
-// //         © KESHAV MEMORIAL INSTITUTE OF TECHNOLOGY
-// //       </footer>
-// //     </div>
-// //   );
-// // }
-
-// // /* ------------------ STYLES ------------------ */
-// // const styles = {
-// //   container: {
-// //     minHeight: "100vh",
-// //     width: "100vw",
-// //     background: "linear-gradient(180deg, #12385b, #12263a)",
-// //     color: "#fff",
-// //     fontFamily: "Poppins",
-// //   },
-
-// //   header: {
-// //     padding: "18px 40px",
-// //     background: "#0d2238",
-// //     borderBottom: "2px solid #b38b59",
-// //   },
-
-// //   logo: { fontSize: "1.5rem", color: "#c9a646", fontWeight: 700 },
-
-// //   hamburgerRow: {
-// //     width: "100%",
-// //     padding: "10px 40px 0px 40px",
-// //   },
-
-// //   hamburger: {
-// //     fontSize: "28px",
-// //     color: "#c9a646",
-// //     cursor: "pointer",
-// //   },
-
-// //   sideMenu: {
-// //     position: "fixed",
-// //     top: "80px",
-// //     left: 0,
-// //     width: "240px",
-// //     height: "100vh",
-// //     background: "#0d2238",
-// //     borderRight: "2px solid #b38b59",
-// //     padding: "20px",
-// //     zIndex: 99999,
-// //   },
-
-// //   closeMenuBtn: {
-// //     background: "red",
-// //     color: "#fff",
-// //     border: "none",
-// //     padding: "5px 10px",
-// //     borderRadius: "5px",
-// //     float: "right",
-// //     cursor: "pointer",
-// //   },
-
-// //   menuItem: {
-// //     width: "100%",
-// //     marginTop: "20px",
-// //     padding: "12px",
-// //     background: "rgba(255,255,255,0.2)",
-// //     color: "#fff",
-// //     borderRadius: "8px",
-// //     cursor: "pointer",
-// //     textAlign: "left",
-// //   },
-
-// //   historyPanel: {
-// //     position: "fixed",
-// //     top: "80px",
-// //     right: 0,
-// //     width: "360px",
-// //     height: "calc(100vh - 80px)",
-// //     background: "#0d2238",
-// //     borderLeft: "2px solid #b38b59",
-// //     padding: "20px",
-// //     overflowY: "auto",
-// //     zIndex: 999999,
-// //   },
-
-// //   historyHeader: {
-// //     display: "flex",
-// //     justifyContent: "space-between",
-// //     alignItems: "center",
-// //   },
-
-// //   closeBtn: {
-// //     background: "red",
-// //     border: "none",
-// //     padding: "6px 10px",
-// //     color: "#fff",
-// //     borderRadius: "6px",
-// //     cursor: "pointer",
-// //   },
-
-// //   historyList: {
-// //     marginTop: "20px",
-// //     display: "flex",
-// //     flexDirection: "column",
-// //     gap: "10px",
-// //   },
-
-// //   historyItem: {
-// //     background: "rgba(255,255,255,0.1)",
-// //     padding: "12px",
-// //     borderRadius: "8px",
-// //   },
-
-// //   main: { textAlign: "center", marginTop: "40px" },
-
-// //   title: { fontSize: "2.4rem", color: "#c9a646" },
-
-// //   uploadButton: {
-// //     marginTop: "20px",
-// //     padding: "10px 20px",
-// //     background: "#2b6cb0",
-// //     borderRadius: "8px",
-// //     color: "#fff",
-// //   },
-
-// //   saveButton: {
-// //     marginTop: "15px",
-// //     padding: "10px 20px",
-// //     background: "#c9a646",
-// //     color: "#000",
-// //     fontWeight: "700",
-// //     borderRadius: "8px",
-// //   },
-
-// //   fileName: { marginTop: "10px" },
-
-// //   dropdown: {
-// //     marginTop: "15px",
-// //     padding: "8px",
-// //   },
-
-// //   searchBar: {
-// //     marginTop: "20px",
-// //     display: "flex",
-// //     justifyContent: "center",
-// //     gap: "10px",
-// //   },
-
-// //   searchInput: {
-// //     padding: "8px 12px",
-// //     width: "260px",
-// //     borderRadius: "8px",
-// //   },
-
-// //   clearButton: {
-// //     padding: "8px 12px",
-// //     borderRadius: "8px",
-// //     border: "1px solid white",
-// //     color: "white",
-// //     background: "transparent",
-// //   },
-
-// //   rowCount: {
-// //     marginTop: "10px",
-// //     color: "#c9a646",
-// //   },
-
-// //   tableWrapper: {
-// //     marginTop: "15px",
-// //     overflowX: "auto",
-// //   },
-
-// //   table: {
-// //     minWidth: "100%",
-// //     borderCollapse: "collapse",
-// //   },
-
-// //   cell: {
-// //     padding: "10px",
-// //     border: "1px solid rgba(255,255,255,0.3)",
-// //   },
-
-// //   backButton: {
-// //     marginTop: "20px",
-// //     display: "inline-block",
-// //     padding: "12px 30px",
-// //     background: "#b38b59",
-// //     color: "#fff",
-// //     borderRadius: "8px",
-// //   },
-
-// //   footer: {
-// //     marginTop: "40px",
-// //     textAlign: "center",
-// //     padding: "15px",
-// //     background: "#0d2238",
-// //     borderTop: "1px solid #b38b59",
-// //   },
-// // };
-
-
 // import { useParams, Link } from "react-router-dom";
 // import React, { useRef, useState, useEffect } from "react";
 // import * as XLSX from "xlsx/dist/xlsx.full.min.js";
@@ -542,14 +25,14 @@
 
 //   const handleUploadClick = () => fileInputRef.current?.click();
 
-//   // LOAD HISTORY FROM BACKEND
+//   // Load upload history
 //   const loadHistory = async () => {
 //     try {
 //       const res = await fetch("http://localhost:5000/history");
 //       const data = await res.json();
 //       setHistoryData(data);
 //     } catch (err) {
-//       console.error("ERROR:", err);
+//       console.error("Error loading history:", err);
 //     }
 //   };
 
@@ -557,7 +40,7 @@
 //     if (showHistory) loadHistory();
 //   }, [showHistory]);
 
-//   // DUPLICATE DETECTION
+//   // Detect duplicates
 //   const processDuplicates = (rows) => {
 //     const freq = {};
 //     rows.forEach((row, r) => {
@@ -580,7 +63,7 @@
 //     setDuplicateMap(dup);
 //   };
 
-//   // HANDLE EXCEL FILE UPLOAD
+//   // Handle Excel File Input
 //   const handleFile = async (e) => {
 //     const file = e.target.files?.[0];
 //     if (!file) return;
@@ -602,14 +85,16 @@
 
 //     setSheetData(rows);
 
-//     const count = rows.filter((r) => r.some((cell) => cell !== null && cell !== "")).length;
-//     setRowCount(count);
+//     const count = rows.filter((r) =>
+//       r.some((cell) => cell !== null && cell !== "")
+//     ).length;
 
+//     setRowCount(count);
 //     processDuplicates(rows);
 //     setQuery("");
 //   };
 
-//   // CHANGE SHEET
+//   // Change sheet
 //   const handleSheetChange = (e) => {
 //     const sheetName = e.target.value;
 //     setSelectedSheet(sheetName);
@@ -622,13 +107,15 @@
 
 //     setSheetData(rows);
 
-//     const count = rows.filter((r) => r.some((cell) => cell !== null && cell !== "")).length;
-//     setRowCount(count);
+//     const count = rows.filter((r) =>
+//       r.some((cell) => cell !== null && cell !== "")
+//     ).length;
 
+//     setRowCount(count);
 //     processDuplicates(rows);
 //   };
 
-//   // SEARCH FILTERING
+//   // Filter search
 //   const filteredData = React.useMemo(() => {
 //     if (!sheetData || !query) return sheetData;
 
@@ -640,7 +127,7 @@
 
 //   const displayedCount = filteredData ? filteredData.length : 0;
 
-//   // SAVE JSON TO DB
+//   // Save JSON to MySQL
 //   const saveToDatabase = async () => {
 //     if (!sheetData) return alert("No data to save");
 
@@ -657,7 +144,7 @@
 //       const result = await res.json();
 //       alert(result.message);
 //     } catch (err) {
-//       alert("Failed to save");
+//       alert("Failed to save to database");
 //     }
 //   };
 
@@ -670,13 +157,20 @@
 
 //       {/* HAMBURGER */}
 //       <div style={styles.hamburgerRow}>
-//         <span style={styles.hamburger} onClick={() => setShowMenu(true)}>☰</span>
+//         <span style={styles.hamburger} onClick={() => setShowMenu(true)}>
+//           ☰
+//         </span>
 //       </div>
 
 //       {/* LEFT MENU */}
 //       {showMenu && (
 //         <div style={styles.sideMenu}>
-//           <button style={styles.closeMenuBtn} onClick={() => setShowMenu(false)}>X</button>
+//           <button
+//             style={styles.closeMenuBtn}
+//             onClick={() => setShowMenu(false)}
+//           >
+//             X
+//           </button>
 
 //           <h3 style={{ color: "#c9a646" }}>Menu</h3>
 
@@ -692,23 +186,29 @@
 //         </div>
 //       )}
 
-//       {/* RIGHT HISTORY PANEL */}
+//       {/* HISTORY PANEL */}
 //       {showHistory && (
 //         <div style={styles.historyPanel}>
 //           <div style={styles.historyHeader}>
-//             <h3 style={{ fontSize: "22px" }}>Upload History</h3>
-//             <button style={styles.closeBtn} onClick={() => setShowHistory(false)}>X</button>
+//             <h3>Upload History</h3>
+//             <button
+//               onClick={() => setShowHistory(false)}
+//               style={styles.closeBtn}
+//             >
+//               X
+//             </button>
 //           </div>
 
 //           <div style={styles.historyList}>
 //             {historyData.map((item) => (
 //               <div key={item.id} style={styles.historyItem}>
-//                 <div style={styles.historyTextBox}>
+//                 <div>
 //                   <strong>{item.file_name}</strong>
 //                   <div style={{ fontSize: "12px", opacity: 0.7 }}>
 //                     {new Date(item.uploaded_at).toLocaleString("en-IN", {
-//                       timeZone: "Asia/Kolkata",
-//                     })}
+//   timeZone: "Asia/Kolkata"
+// })}
+//                     {/* {item.uploaded_at} */}
 //                   </div>
 //                 </div>
 //               </div>
@@ -717,13 +217,15 @@
 //         </div>
 //       )}
 
-//       {/* MAIN CONTENT */}
+//       {/* MAIN SECTION */}
 //       <main style={styles.main}>
 //         <h1 style={styles.title}>Task {id}</h1>
 
 //         {id === "1" && (
 //           <>
-//             <button onClick={handleUploadClick} style={styles.uploadButton}>Upload Excel</button>
+//             <button onClick={handleUploadClick} style={styles.uploadButton}>
+//               Upload Excel
+//             </button>
 
 //             <input
 //               ref={fileInputRef}
@@ -735,16 +237,22 @@
 
 //             {fileName && <p style={styles.fileName}>Uploaded: {fileName}</p>}
 
-//             {/* SHEET SELECTOR */}
+//             {/* Sheet selector */}
 //             {sheets.length > 1 && (
-//               <select value={selectedSheet} onChange={handleSheetChange} style={styles.dropdown}>
-//                 {sheets.map((sheet, i) => (
-//                   <option key={i} value={sheet}>{sheet}</option>
+//               <select
+//                 value={selectedSheet}
+//                 onChange={handleSheetChange}
+//                 style={styles.dropdown}
+//               >
+//                 {sheets.map((sheet, index) => (
+//                   <option key={index} value={sheet}>
+//                     {sheet}
+//                   </option>
 //                 ))}
 //               </select>
 //             )}
 
-//             {/* SEARCH */}
+//             {/* Search */}
 //             {sheetData && (
 //               <div style={styles.searchBar}>
 //                 <input
@@ -753,16 +261,18 @@
 //                   placeholder="Search..."
 //                   style={styles.searchInput}
 //                 />
-//                 <button onClick={() => setQuery("")} style={styles.clearButton}>Clear</button>
+//                 <button onClick={() => setQuery("")} style={styles.clearButton}>
+//                   Clear
+//                 </button>
 //               </div>
 //             )}
 
-//             {/* ROW COUNT */}
+//             {/* Row Count */}
 //             {sheetData && (
 //               <div style={styles.rowCount}>Count: {displayedCount}</div>
 //             )}
 
-//             {/* SAVE BUTTON */}
+//             {/* Save button */}
 //             {sheetData && (
 //               <button onClick={saveToDatabase} style={styles.saveButton}>
 //                 Save Excel to Database
@@ -785,6 +295,9 @@
 //                                 ? "#ffcc00"
 //                                 : "transparent",
 //                               color: duplicateMap[`${r}-${c}`] ? "#000" : "#fff",
+//                               fontWeight: duplicateMap[`${r}-${c}`]
+//                                 ? "700"
+//                                 : "400",
 //                             }}
 //                           >
 //                             {String(cell ?? "")}
@@ -799,7 +312,9 @@
 //           </>
 //         )}
 
-//         <Link to="/" style={styles.backButton}>← Back to Home</Link>
+//         <Link to="/" style={styles.backButton}>
+//           ← Back to Home
+//         </Link>
 //       </main>
 
 //       {/* FOOTER */}
@@ -810,7 +325,7 @@
 //   );
 // }
 
-// /* ----------------------------------- STYLES ----------------------------------- */
+// /* ------------------ STYLES ------------------ */
 // const styles = {
 //   container: {
 //     minHeight: "100vh",
@@ -889,7 +404,6 @@
 //     display: "flex",
 //     justifyContent: "space-between",
 //     alignItems: "center",
-//     marginBottom: "10px",
 //   },
 
 //   closeBtn: {
@@ -902,6 +416,7 @@
 //   },
 
 //   historyList: {
+//     marginTop: "20px",
 //     display: "flex",
 //     flexDirection: "column",
 //     gap: "10px",
@@ -911,15 +426,6 @@
 //     background: "rgba(255,255,255,0.1)",
 //     padding: "12px",
 //     borderRadius: "8px",
-//     display: "flex",
-//     flexDirection: "column",
-//   },
-
-//   historyTextBox: {
-//     width: "100%",
-//     wordBreak: "break-word",
-//     overflowWrap: "break-word",
-//     whiteSpace: "normal",
 //   },
 
 //   main: { textAlign: "center", marginTop: "40px" },
@@ -948,7 +454,6 @@
 //   dropdown: {
 //     marginTop: "15px",
 //     padding: "8px",
-//     borderRadius: "8px",
 //   },
 
 //   searchBar: {
@@ -977,9 +482,15 @@
 //     color: "#c9a646",
 //   },
 
-//   tableWrapper: { marginTop: "15px", overflowX: "auto" },
+//   tableWrapper: {
+//     marginTop: "15px",
+//     overflowX: "auto",
+//   },
 
-//   table: { minWidth: "100%", borderCollapse: "collapse" },
+//   table: {
+//     minWidth: "100%",
+//     borderCollapse: "collapse",
+//   },
 
 //   cell: {
 //     padding: "10px",
@@ -1005,13 +516,9 @@
 // };
 
 
-// ---------------- START OF UPDATED CODE ----------------
-
 import { useParams, Link } from "react-router-dom";
 import React, { useRef, useState, useEffect } from "react";
 import * as XLSX from "xlsx/dist/xlsx.full.min.js";
-
-const API_BASE = "https://kmit-backend-production.up.railway.app";
 
 export default function TaskPage() {
   const { id } = useParams();
@@ -1028,16 +535,22 @@ export default function TaskPage() {
   const [rowCount, setRowCount] = useState(0);
   const [duplicateMap, setDuplicateMap] = useState({});
 
+  // UI states
   const [showMenu, setShowMenu] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [historyData, setHistoryData] = useState([]);
 
   const handleUploadClick = () => fileInputRef.current?.click();
+  const API_BASE = "https://YOUR-RAILWAY-URL.up.railway.app";
 
-  // ------------------ UPDATED loadHistory ------------------
+
+
+  // LOAD HISTORY FROM BACKEND
   const loadHistory = async () => {
     try {
+      // const res = await fetch("http://localhost:5000/history");
       const res = await fetch(`${API_BASE}/history`);
+
       const data = await res.json();
       setHistoryData(data);
     } catch (err) {
@@ -1049,6 +562,7 @@ export default function TaskPage() {
     if (showHistory) loadHistory();
   }, [showHistory]);
 
+  // DUPLICATE DETECTION
   const processDuplicates = (rows) => {
     const freq = {};
     rows.forEach((row, r) => {
@@ -1071,6 +585,7 @@ export default function TaskPage() {
     setDuplicateMap(dup);
   };
 
+  // HANDLE EXCEL FILE UPLOAD
   const handleFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1099,6 +614,7 @@ export default function TaskPage() {
     setQuery("");
   };
 
+  // CHANGE SHEET
   const handleSheetChange = (e) => {
     const sheetName = e.target.value;
     setSelectedSheet(sheetName);
@@ -1117,6 +633,7 @@ export default function TaskPage() {
     processDuplicates(rows);
   };
 
+  // SEARCH FILTERING
   const filteredData = React.useMemo(() => {
     if (!sheetData || !query) return sheetData;
 
@@ -1128,22 +645,31 @@ export default function TaskPage() {
 
   const displayedCount = filteredData ? filteredData.length : 0;
 
-  // ------------------ UPDATED saveToDatabase ------------------
+  // SAVE JSON TO DB
   const saveToDatabase = async () => {
     if (!sheetData) return alert("No data to save");
 
     try {
       const res = await fetch(`${API_BASE}/upload-json`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          file_name: fileName,
-          json_data: sheetData,
-        }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    file_name: fileName,
+    json_data: sheetData,
+  }),
+});
+
+      // const res = await fetch("http://localhost:5000/upload-json", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     file_name: fileName,
+      //     json_data: sheetData,
+      //   }),
+      // });
 
       const result = await res.json();
-      alert(result.message || "Saved successfully!");
+      alert(result.message);
     } catch (err) {
       alert("Failed to save");
     }
@@ -1151,15 +677,17 @@ export default function TaskPage() {
 
   return (
     <div style={styles.container}>
-
+      {/* HEADER */}
       <header style={styles.header}>
         <h2 style={styles.logo}>🏫 KMIT</h2>
       </header>
 
+      {/* HAMBURGER */}
       <div style={styles.hamburgerRow}>
         <span style={styles.hamburger} onClick={() => setShowMenu(true)}>☰</span>
       </div>
 
+      {/* LEFT MENU */}
       {showMenu && (
         <div style={styles.sideMenu}>
           <button style={styles.closeMenuBtn} onClick={() => setShowMenu(false)}>X</button>
@@ -1178,6 +706,7 @@ export default function TaskPage() {
         </div>
       )}
 
+      {/* RIGHT HISTORY PANEL */}
       {showHistory && (
         <div style={styles.historyPanel}>
           <div style={styles.historyHeader}>
@@ -1202,6 +731,7 @@ export default function TaskPage() {
         </div>
       )}
 
+      {/* MAIN CONTENT */}
       <main style={styles.main}>
         <h1 style={styles.title}>Task {id}</h1>
 
@@ -1219,6 +749,7 @@ export default function TaskPage() {
 
             {fileName && <p style={styles.fileName}>Uploaded: {fileName}</p>}
 
+            {/* SHEET SELECTOR */}
             {sheets.length > 1 && (
               <select value={selectedSheet} onChange={handleSheetChange} style={styles.dropdown}>
                 {sheets.map((sheet, i) => (
@@ -1227,6 +758,7 @@ export default function TaskPage() {
               </select>
             )}
 
+            {/* SEARCH */}
             {sheetData && (
               <div style={styles.searchBar}>
                 <input
@@ -1239,16 +771,19 @@ export default function TaskPage() {
               </div>
             )}
 
+            {/* ROW COUNT */}
             {sheetData && (
               <div style={styles.rowCount}>Count: {displayedCount}</div>
             )}
 
+            {/* SAVE BUTTON */}
             {sheetData && (
               <button onClick={saveToDatabase} style={styles.saveButton}>
                 Save Excel to Database
               </button>
             )}
 
+            {/* TABLE */}
             {filteredData && (
               <div style={styles.tableWrapper}>
                 <table style={styles.table}>
@@ -1281,6 +816,7 @@ export default function TaskPage() {
         <Link to="/" style={styles.backButton}>← Back to Home</Link>
       </main>
 
+      {/* FOOTER */}
       <footer style={styles.footer}>
         © KESHAV MEMORIAL INSTITUTE OF TECHNOLOGY
       </footer>
@@ -1288,4 +824,196 @@ export default function TaskPage() {
   );
 }
 
-// ---------------- END OF UPDATED CODE ----------------
+/* ----------------------------------- STYLES ----------------------------------- */
+const styles = {
+  container: {
+    minHeight: "100vh",
+    width: "100vw",
+    background: "linear-gradient(180deg, #12385b, #12263a)",
+    color: "#fff",
+    fontFamily: "Poppins",
+  },
+
+  header: {
+    padding: "18px 40px",
+    background: "#0d2238",
+    borderBottom: "2px solid #b38b59",
+  },
+
+  logo: { fontSize: "1.5rem", color: "#c9a646", fontWeight: 700 },
+
+  hamburgerRow: {
+    width: "100%",
+    padding: "10px 40px 0px 40px",
+  },
+
+  hamburger: {
+    fontSize: "28px",
+    color: "#c9a646",
+    cursor: "pointer",
+  },
+
+  sideMenu: {
+    position: "fixed",
+    top: "80px",
+    left: 0,
+    width: "240px",
+    height: "100vh",
+    background: "#0d2238",
+    borderRight: "2px solid #b38b59",
+    padding: "20px",
+    zIndex: 99999,
+  },
+
+  closeMenuBtn: {
+    background: "red",
+    color: "#fff",
+    border: "none",
+    padding: "5px 10px",
+    borderRadius: "5px",
+    float: "right",
+    cursor: "pointer",
+  },
+
+  menuItem: {
+    width: "100%",
+    marginTop: "20px",
+    padding: "12px",
+    background: "rgba(255,255,255,0.2)",
+    color: "#fff",
+    borderRadius: "8px",
+    cursor: "pointer",
+    textAlign: "left",
+  },
+
+  historyPanel: {
+    position: "fixed",
+    top: "80px",
+    right: 0,
+    width: "360px",
+    height: "calc(100vh - 80px)",
+    background: "#0d2238",
+    borderLeft: "2px solid #b38b59",
+    padding: "20px",
+    overflowY: "auto",
+    zIndex: 999999,
+  },
+
+  historyHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+  },
+
+  closeBtn: {
+    background: "red",
+    border: "none",
+    padding: "6px 10px",
+    color: "#fff",
+    borderRadius: "6px",
+    cursor: "pointer",
+  },
+
+  historyList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+
+  historyItem: {
+    background: "rgba(255,255,255,0.1)",
+    padding: "12px",
+    borderRadius: "8px",
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  historyTextBox: {
+    width: "100%",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "normal",
+  },
+
+  main: { textAlign: "center", marginTop: "40px" },
+
+  title: { fontSize: "2.4rem", color: "#c9a646" },
+
+  uploadButton: {
+    marginTop: "20px",
+    padding: "10px 20px",
+    background: "#2b6cb0",
+    borderRadius: "8px",
+    color: "#fff",
+  },
+
+  saveButton: {
+    marginTop: "15px",
+    padding: "10px 20px",
+    background: "#c9a646",
+    color: "#000",
+    fontWeight: "700",
+    borderRadius: "8px",
+  },
+
+  fileName: { marginTop: "10px" },
+
+  dropdown: {
+    marginTop: "15px",
+    padding: "8px",
+    borderRadius: "8px",
+  },
+
+  searchBar: {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+  },
+
+  searchInput: {
+    padding: "8px 12px",
+    width: "260px",
+    borderRadius: "8px",
+  },
+
+  clearButton: {
+    padding: "8px 12px",
+    borderRadius: "8px",
+    border: "1px solid white",
+    color: "white",
+    background: "transparent",
+  },
+
+  rowCount: {
+    marginTop: "10px",
+    color: "#c9a646",
+  },
+
+  tableWrapper: { marginTop: "15px", overflowX: "auto" },
+
+  table: { minWidth: "100%", borderCollapse: "collapse" },
+
+  cell: {
+    padding: "10px",
+    border: "1px solid rgba(255,255,255,0.3)",
+  },
+
+  backButton: {
+    marginTop: "20px",
+    display: "inline-block",
+    padding: "12px 30px",
+    background: "#b38b59",
+    color: "#fff",
+    borderRadius: "8px",
+  },
+
+  footer: {
+    marginTop: "40px",
+    textAlign: "center",
+    padding: "15px",
+    background: "#0d2238",
+    borderTop: "1px solid #b38b59",
+  },
+};
