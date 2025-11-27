@@ -24,8 +24,10 @@ export default function TaskPage() {
   const [historyData, setHistoryData] = useState([]);
 
   const handleUploadClick = () => fileInputRef.current?.click();
+const API_BASE = import.meta.env.VITE_API_BASE;
 
-  const API_BASE = "https://kmit-backend-production-a8de.up.railway.app";
+  // const API_BASE = "https://kmit-backend-production-a8de.up.railway.app";
+
 
 
 
